@@ -15,19 +15,17 @@ import (
 )
 
 type CotacaoDolar struct {
-	Usdbrl struct {
-		Code       string `json:"code"`
-		Codein     string `json:"codein"`
-		Name       string `json:"name"`
-		High       string `json:"high"`
-		Low        string `json:"low"`
-		VarBid     string `json:"varBid"`
-		PctChange  string `json:"pctChange"`
-		Bid        string `json:"bid"`
-		Ask        string `json:"ask"`
-		Timestamp  string `json:"timestamp"`
-		CreateDate string `json:"create_date"`
-	} `json:"USDBRL"`
+	Code       string `json:"code"`
+	Codein     string `json:"codein"`
+	Name       string `json:"name"`
+	High       string `json:"high"`
+	Low        string `json:"low"`
+	VarBid     string `json:"varBid"`
+	PctChange  string `json:"pctChange"`
+	Bid        string `json:"bid"`
+	Ask        string `json:"ask"`
+	Timestamp  string `json:"timestamp"`
+	CreateDate string `json:"create_date"`
 }
 
 type BidOnly struct {
@@ -52,16 +50,7 @@ func BuscaDolarHandler(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	/*result, err := json.Marshal(cot_dolar)
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-	w.Write(result)*/
 
-	//json.NewEncoder(w).Encode(cot_dolar)
 	fmt.Println(cot_dolar)
 	err := SalvarBidDB(cot_dolar)
 	if err != nil {
@@ -70,7 +59,7 @@ func BuscaDolarHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	bidOnly := BidOnly{Bid: cot_dolar.Usdbrl.Bid}
+	bidOnly := BidOnly{Bid: cot_dolar.Bid}
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(bidOnly)
 	w.Header().Set("Content-Type", "application/json")
@@ -97,12 +86,14 @@ func BuscaCotacaodolarCtx() (*CotacaoDolar, error) {
 		return nil, err
 	}
 	var cotacao CotacaoDolar
+	var data map[string]CotacaoDolar
 
-	err = json.Unmarshal(body, &cotacao)
+	err = json.Unmarshal(body, &data)
 	if err != nil {
 		return nil, err
 	}
 
+	cotacao = data["USDBRL"]
 	return &cotacao, nil
 
 }
